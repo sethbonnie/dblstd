@@ -16,8 +16,9 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "dblstd <repo_path>",
-	Short: "checks if a repo conforms to a given standard",
+	Use:     "dblstd <repo_path>",
+	Version: "0.0.2",
+	Short:   "checks if a repo conforms to a given standard",
 	Long: `dblstd - short for DoubleStandards - checks if a project repo
 conforms to a given standard (in the form of a "shape" file).
 
@@ -47,7 +48,6 @@ Prints any of the files in the shape that are missing from the repo.`,
 		}
 		return nil
 	},
-	Version: "0.1",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
