@@ -10,7 +10,7 @@ import (
 // shape file returning any items missing required paths.
 // The depth argument controls how deep to walk through the repo. By default
 // we walk through the whole repo.
-func Missing(repoPath string, shape []byte, depth int) ([]string, error) {
+func Missing(repoPath string, shape []byte, depth int) (map[string]bool, error) {
 	paths, err := walkDir(repoPath, depth)
 	if err != nil {
 		return nil, err
@@ -30,10 +30,10 @@ func Missing(repoPath string, shape []byte, depth int) ([]string, error) {
 	}
 
 	if len(seen) < len(requiredPaths) {
-		missing := []string{}
-		for path := range requiredPaths {
+		missing := make(map[string]bool)
+		for path, isDir := range requiredPaths {
 			if _, ok := seen[path]; !ok {
-				missing = append(missing, path)
+				missing[path] = isDir
 			}
 		}
 		return missing, nil

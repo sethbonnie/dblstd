@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/sethbonnie/dblstd/shape"
 	"github.com/spf13/viper"
 )
 
@@ -14,13 +16,35 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "dblstd",
+	Use:   "dblstd --shapeFile <path> <repo_path>",
 	Short: "checks if a repo conforms to a given standard",
 	Long: `dblstd - short for DoubleStandards - checks if a project repo
 conforms to a given standard (in the form of a "shape" file).`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	RunE: func(cmd *cobra.Command, args []string) error {
+		shapeFile, err := cmd.Flags().GetString("shape-file")
+		if err != nil {
+			return err
+		}
+		shapeData, err := ioutil.ReadFile(shapeFile)
+		if err != nil {
+			return err
+		}
+
+		missing, err := shape.Missing(args[0], shapeData, 0)
+		if err != nil {
+			return err
+		}
+		for path, isDir := range missing {
+			if isDir {
+				fmt.Fprintf(os.Stderr, "Missing required directory: %s\n", path)
+			} else {
+				fmt.Fprintf(os.Stderr, "Missing required file: %s\n", path)
+			}
+		}
+		return nil
+	},
 	Version: "0.1",
 }
 

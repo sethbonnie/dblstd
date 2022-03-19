@@ -19,28 +19,28 @@ func TestMissing(t *testing.T) {
 		shape    []byte
 		root     string
 		depth    int
-		expected []string
+		expected map[string]bool
 	}{
 		{
 			name:     "NoneMissingDefaultDepth",
 			root:     "./testdata",
 			shape:    shape,
 			depth:    0,
-			expected: nil,
+			expected: map[string]bool{},
 		},
 		{
 			name:     "NoneMissingHighDepth",
 			root:     "./testdata",
 			shape:    shape,
 			depth:    10,
-			expected: nil,
+			expected: map[string]bool{},
 		},
 		{name: "MissingNestedDir",
 			root:  "./testdata",
 			shape: shape,
 			depth: 1,
-			expected: []string{
-				".github/workflows",
+			expected: map[string]bool{
+				".github/workflows": true,
 			},
 		},
 	}
@@ -51,6 +51,9 @@ func TestMissing(t *testing.T) {
 			assert.Nil(t, err)
 
 			assert.Len(t, actual, len(tc.expected))
+			for path := range actual {
+				assert.Equal(t, actual[path], tc.expected[path])
+			}
 		})
 	}
 }
