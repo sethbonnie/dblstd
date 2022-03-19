@@ -34,7 +34,7 @@ Prints any of the files in the shape that are missing from the repo.`,
 			return err
 		}
 
-		missing, err := shape.Missing(args[0], shapeData, 0)
+		missing, err := shape.Missing(args[0], shapeData)
 		if err != nil {
 			return err
 		}
