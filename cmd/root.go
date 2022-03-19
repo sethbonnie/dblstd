@@ -16,10 +16,12 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "dblstd --shapeFile <path> <repo_path>",
+	Use:   "dblstd <repo_path>",
 	Short: "checks if a repo conforms to a given standard",
 	Long: `dblstd - short for DoubleStandards - checks if a project repo
-conforms to a given standard (in the form of a "shape" file).`,
+conforms to a given standard (in the form of a "shape" file).
+
+Prints any of the files in the shape that are missing from the repo.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -63,7 +65,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dblstd.yaml)")
 
-	rootCmd.PersistentFlags().StringP("shape-file", "s", "", "file containing expected shape of repo")
+	rootCmd.PersistentFlags().StringP("shape-file", "s", "", "(required) path to file containing expected shape of repo")
+	rootCmd.MarkPersistentFlagRequired("shape-file")
 
 	versionTemplate := `{{printf "%s: %s - version %s\n" .Name .Short .Version}}`
 	rootCmd.SetVersionTemplate(versionTemplate)
