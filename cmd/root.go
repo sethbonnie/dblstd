@@ -30,12 +30,16 @@ Prints any of the files in the shape that are missing from the repo.`,
 		if err != nil {
 			return err
 		}
-		shapeData, err := ioutil.ReadFile(shapeFile)
+		shapeSpec, err := ioutil.ReadFile(shapeFile)
 		if err != nil {
 			return err
 		}
-
-		missing, err := shape.Missing(args[0], shapeData)
+		s, err := shape.NewShape(shapeSpec)
+		if err != nil {
+			return err
+		}
+		rootDir := args[0]
+		missing, err := s.Missing(rootDir)
 		if err != nil {
 			return err
 		}

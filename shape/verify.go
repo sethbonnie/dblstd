@@ -1,7 +1,6 @@
 package shape
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,14 +10,9 @@ import (
 // shape file returning any items missing required paths.
 // The depth argument controls how deep to walk through the repo. By default
 // we walk through the whole repo.
-func Missing(repoPath string, shape []byte) (map[string]bool, error) {
-	requiredPaths, err := Parse(shape)
-	if err != nil {
-		return nil, err
-	}
-
+func (s *Shape) Missing(repoPath string) (Paths, error) {
 	var depth int
-	for path := range requiredPaths {
+	for path := range s.paths {
 		depth = max(depth, strings.Count(path, "/")+1)
 	}
 	paths, err := walkDir(repoPath, depth)
@@ -29,19 +23,18 @@ func Missing(repoPath string, shape []byte) (map[string]bool, error) {
 	seen := make(map[string]bool)
 
 	for _, path := range paths {
-		if _, ok := requiredPaths[path]; ok {
+		if _, ok := s.paths[path]; ok {
 			seen[path] = true
 		}
 	}
 
-	if len(seen) < len(requiredPaths) {
-		missing := make(map[string]bool)
-		for path, isDir := range requiredPaths {
+	if len(seen) < len(s.paths) {
+		missing := Paths{}
+		for path, isDir := range s.paths {
 			if _, ok := seen[path]; !ok {
 				missing[path] = isDir
 			}
 		}
-		fmt.Printf("missing: %v\n", missing)
 		return missing, nil
 	}
 	return nil, nil

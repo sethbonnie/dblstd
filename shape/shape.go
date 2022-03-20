@@ -6,12 +6,26 @@ import (
 	"strings"
 )
 
+type Paths map[string]bool
+
+type Shape struct {
+	paths Paths
+}
+
+func NewShape(spec []byte) (*Shape, error) {
+	paths, err := parse(spec)
+	if err != nil {
+		return nil, err
+	}
+	return &Shape{paths}, nil
+}
+
 // Parse takes a slice of bytes representing a shape and returns map of paths.
 // If the path represents a directory the value is true, otherwise false.
-func Parse(f []byte) (map[string]bool, error) {
+func parse(spec []byte) (Paths, error) {
 	// Keeps track of the directory we're in
-	paths := make(map[string]bool)
-	reader := bytes.NewReader(f)
+	paths := Paths{}
+	reader := bytes.NewReader(spec)
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
