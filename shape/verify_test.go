@@ -64,7 +64,9 @@ func TestMissing(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actual, err := Missing(tc.root, tc.shape)
+			s, err := NewShape(tc.shape)
+			assert.Nil(t, err)
+			actual, err := s.Missing(tc.root)
 			assert.Nil(t, err)
 
 			assert.Len(t, actual, len(tc.expected))

@@ -17,7 +17,7 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "dblstd <repo_path>",
-	Version: "0.0.2",
+	Version: "0.1.0",
 	Short:   "checks if a repo conforms to a given standard",
 	Long: `dblstd - short for DoubleStandards - checks if a project repo
 conforms to a given standard (in the form of a "shape" file).
@@ -30,12 +30,16 @@ Prints any of the files in the shape that are missing from the repo.`,
 		if err != nil {
 			return err
 		}
-		shapeData, err := ioutil.ReadFile(shapeFile)
+		shapeSpec, err := ioutil.ReadFile(shapeFile)
 		if err != nil {
 			return err
 		}
-
-		missing, err := shape.Missing(args[0], shapeData)
+		s, err := shape.NewShape(shapeSpec)
+		if err != nil {
+			return err
+		}
+		rootDir := args[0]
+		missing, err := s.Missing(rootDir)
 		if err != nil {
 			return err
 		}

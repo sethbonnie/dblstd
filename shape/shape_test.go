@@ -8,19 +8,19 @@ import (
 
 func TestParse(t *testing.T) {
 	testCases := []struct {
-		name   string
-		shape  []byte
-		result map[string]bool
+		name      string
+		shapeSpec []byte
+		result    Paths
 	}{
 		{
 			name: "NoBlankLines",
-			shape: []byte(`
+			shapeSpec: []byte(`
 				README.md
 				LICENSE
 				.github/workflows/
 				go.mod
 			`),
-			result: map[string]bool{
+			result: Paths{
 				"README.md":         false,
 				"LICENSE":           false,
 				".github/workflows": true,
@@ -29,7 +29,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "WithBlankLines",
-			shape: []byte(`
+			shapeSpec: []byte(`
 					README.md
 
 					LICENSE
@@ -39,7 +39,7 @@ func TestParse(t *testing.T) {
 					
 					go.mod
 				`),
-			result: map[string]bool{
+			result: Paths{
 				"README.md":         false,
 				"LICENSE":           false,
 				".github/workflows": true,
@@ -50,10 +50,10 @@ func TestParse(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := Parse(tc.shape)
+			s, err := NewShape(tc.shapeSpec)
 			assert.Nil(t, err)
-			assert.Equal(t, len(result), len(tc.result))
-			for path, isDir := range result {
+			assert.Equal(t, len(s.paths), len(tc.result))
+			for path, isDir := range s.paths {
 				_, ok := tc.result[path]
 				assert.True(t, ok)
 				assert.Equal(t, tc.result[path], isDir)
