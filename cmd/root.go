@@ -45,9 +45,9 @@ Prints any of the files in the shape that are missing from the repo.`,
 		}
 		for path, isDir := range missing {
 			if isDir {
-				fmt.Fprintf(os.Stderr, "Missing required directory: %s\n", path)
+				fmt.Fprintf(os.Stderr, "⚠️ Missing required directory: %s\n", path)
 			} else {
-				fmt.Fprintf(os.Stderr, "Missing required file: %s\n", path)
+				fmt.Fprintf(os.Stderr, "⚠️ Missing required file: %s\n", path)
 			}
 		}
 		return nil
