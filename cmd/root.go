@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -39,8 +40,9 @@ Prints any of the files in the shape that are missing from the repo.`,
 		var shapeSpec []byte
 
 		// Check if the filename is actually a URL
+
 		_, err = url.Parse(shapeFilename)
-		if err == nil {
+		if strings.HasPrefix(shapeFilename, "http") && err == nil {
 			res, err := http.Get(shapeFilename)
 			if err != nil {
 				return err
@@ -71,8 +73,8 @@ Prints any of the files in the shape that are missing from the repo.`,
 		if err != nil {
 			return err
 		}
-		for pathName, path := range missing {
-			if path.IsDir {
+		for pathName, isDir := range missing {
+			if isDir {
 				fmt.Fprintf(os.Stderr, "⚠️ Missing required directory: %s\n", pathName)
 			} else {
 				fmt.Fprintf(os.Stderr, "⚠️ Missing required file: %s\n", pathName)
