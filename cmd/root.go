@@ -42,7 +42,7 @@ Prints any of the files in the shape that are missing from the repo.`,
 		// Check if the filename is actually a URL
 
 		_, err = url.Parse(shapeFilename)
-		if strings.HasPrefix(shapeFilename, "http") && err == nil {
+		if strings.HasPrefix(strings.ToLower(shapeFilename), "http") && err == nil {
 			res, err := http.Get(shapeFilename)
 			if err != nil {
 				return err
