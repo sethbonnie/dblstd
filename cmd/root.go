@@ -40,9 +40,9 @@ Prints any of the files in the shape that are missing from the repo.`,
 		var shapeSpec []byte
 
 		// Check if the filename is actually a URL
+		parsedUrl, err := url.Parse(shapeFilename)
 
-		_, err = url.Parse(shapeFilename)
-		if strings.HasPrefix(strings.ToLower(shapeFilename), "http") && err == nil {
+		if strings.HasPrefix(parsedUrl.Scheme, "http") && err == nil {
 			res, err := http.Get(shapeFilename)
 			if err != nil {
 				return err
