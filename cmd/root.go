@@ -3,7 +3,10 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -26,14 +29,41 @@ Prints any of the files in the shape that are missing from the repo.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	RunE: func(cmd *cobra.Command, args []string) error {
-		shapeFile, err := cmd.Flags().GetString("shape-file")
+		shapeFilename, err := cmd.Flags().GetString("shape-file")
 		if err != nil {
 			return err
 		}
-		shapeSpec, err := ioutil.ReadFile(shapeFile)
-		if err != nil {
-			return err
+		if shapeFilename == "" {
+			return fmt.Errorf("shape file must be specified")
 		}
+
+		var shapeSpec []byte
+
+		// Check if the filename is actually a URL
+		parsedUrl, err := url.Parse(shapeFilename)
+
+		if strings.HasPrefix(parsedUrl.Scheme, "http") && err == nil {
+			res, err := http.Get(shapeFilename)
+			if err != nil {
+				return err
+			}
+
+			data, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				return err
+			}
+
+			shapeSpec = data
+
+		} else {
+			data, err := ioutil.ReadFile(shapeFilename)
+			if err != nil {
+				return err
+			}
+
+			shapeSpec = data
+		}
+
 		s, err := shape.NewShape(shapeSpec)
 		if err != nil {
 			return err
@@ -43,11 +73,11 @@ Prints any of the files in the shape that are missing from the repo.`,
 		if err != nil {
 			return err
 		}
-		for path, isDir := range missing {
+		for pathName, isDir := range missing {
 			if isDir {
-				fmt.Fprintf(os.Stderr, "⚠️ Missing required directory: %s\n", path)
+				fmt.Fprintf(os.Stderr, "⚠️ Missing required directory: %s\n", pathName)
 			} else {
-				fmt.Fprintf(os.Stderr, "⚠️ Missing required file: %s\n", path)
+				fmt.Fprintf(os.Stderr, "⚠️ Missing required file: %s\n", pathName)
 			}
 		}
 		return nil
